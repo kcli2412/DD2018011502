@@ -126,4 +126,61 @@ public class MainActivity extends AppCompatActivity {
             return "okay";
         }
     }
+
+    public void click3(View v)
+    {
+        MyImageTask task = new MyImageTask();
+        task.execute("https://5.imimg.com/data5/UH/ND/MY-4431270/red-rose-flower-500x500.jpg");
+    }
+
+    class MyImageTask extends AsyncTask<String, Integer, Bitmap>
+    {
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            img.setImageBitmap(bitmap);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            Log.d("TASK", "onProgressUpdate: values:" + values[0]);
+            tv.setText(values[0].toString());
+            pb.setProgress(values[0]);
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            URL url = null;
+            try {
+                url = new URL(strings[0]);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.connect();
+                InputStream inputStream = conn.getInputStream();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] buf = new byte[1024];
+                final int totalLength = conn.getContentLength();
+                int sum = 0;
+                int length;
+                while ((length = inputStream.read(buf)) != -1)
+                {
+                    sum += length;
+                    final int tmp = sum;
+                    bos.write(buf, 0, length);
+                    publishProgress(100 * tmp / totalLength);
+                }
+                byte[] results = bos.toByteArray();
+                final Bitmap bmp = BitmapFactory.decodeByteArray(results, 0, results.length);
+                return  bmp;
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
 }
