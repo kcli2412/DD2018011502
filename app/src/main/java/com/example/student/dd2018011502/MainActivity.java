@@ -2,14 +2,14 @@ package com.example.student.dd2018011502;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     ImageView img;
-    TextView tv;
+    TextView tv, tv2, tv3;
     ProgressBar pb;
 
     @Override
@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         img = (ImageView) findViewById(R.id.imageView);
         tv = (TextView) findViewById(R.id.textView);
+        tv2 = (TextView) findViewById(R.id.textView2);
+        tv3 = (TextView) findViewById(R.id.textView3);
         pb = (ProgressBar) findViewById(R.id.progressBar);
     }
 
@@ -87,5 +89,41 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }.start();
+    }
+
+    public void click2(View v)
+    {
+        MyTask task = new MyTask();
+        task.execute(10);
+    }
+
+    class MyTask extends AsyncTask <Integer, Integer, String>
+    {
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            tv3.setText(s);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            tv2.setText(values[0].toString());
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+            for (int i = 0; i < integers[0]; i++)
+            {
+                try {
+                    Thread.sleep(1000);
+                    Log.d("TASK", "doInBackground: i:" + i);
+                    publishProgress(i);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "okay";
+        }
     }
 }
